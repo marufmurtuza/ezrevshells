@@ -9,4 +9,4 @@ To install the tool, Run the following commands in your terminal:
 
 --> chmod +x install.sh
 
---> ./install.sh
+--> sudo ./install.sh
